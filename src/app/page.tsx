@@ -1,19 +1,30 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { UserButton } from "@/features/auth/components/user-button";
+import { useCreateWorkspaceModal } from "@/features/workspaces/store/use-create-workspace-modal";
+import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces";
+import { useEffect, useMemo } from "react";
 
 export default function Home() {
-  const { signOut } = useAuthActions();
+  const { data, isLoading } = useGetWorkspaces();
+  const [open, setOpen] = useCreateWorkspaceModal();
+
+  const workspaceId = useMemo(() => data?.[0]?._id, [data]);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (workspaceId) {
+      console.log("Redirect to workspace");
+    } else if (!open) {
+      setOpen(true);
+      console.log("open creation modal");
+    }
+  }, [workspaceId, isLoading, open, setOpen]);
+
   return (
-    <div className="h-full flex flex-col max-w-7xl mx-auto justify-center items-center">
-      <div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod ullam
-        asperiores autem accusantium adipisci iusto quam excepturi minus placeat
-        beatae illum obcaecati nisi in dicta reprehenderit, eos delectus
-        aliquam! Distinctio.
-      </div>
-      <Button onClick={() => void signOut()}>Sign Out</Button>
+    <div className="">
+      <UserButton />
     </div>
   );
 }
